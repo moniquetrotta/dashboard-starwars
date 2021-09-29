@@ -7,7 +7,34 @@ const navesContador = document.getElementById('naves');
 preencherContadores();
 preencherTabela();
 
-function preencherContadores() {
+google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(desenharGrafico);
+
+   async function desenharGrafico() {
+    const response = await swapiGet("vehicles/");
+    const vehiclesArray = response.data.results;
+    console.log(vehiclesArray);
+
+    const dataArray = [];
+    dataArray.push(["Veículos","Passageiros"]);
+    vehiclesArray.forEach(vehicle => {
+      dataArray.push([vehicle.name, Number (vehicle.passengers)]);
+    })
+
+        var data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+          title: 'Maiores Veículos',
+          legend: 'none'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+
+
+ function preencherContadores() {
   Promise.all([swapiGet('people/'),
   swapiGet('vehicles/'),
   swapiGet('planets/'),
